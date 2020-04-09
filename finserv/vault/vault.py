@@ -6,6 +6,7 @@ from Crypto import Random
 
 from .key import Key
 
+
 class Vault:
     def __init__(self, keys):
 
@@ -20,6 +21,7 @@ class Vault:
         if i:
             return self.keys[i - 1]
         raise ValueError('No key is currently active')
+
     def _getKey(self, prefix):
         try:
             return self.prefix_lookup[prefix]
@@ -66,19 +68,19 @@ class Vault:
         return base64.b64encode(token).decode('utf-8')
 
     def getPAN(self, token):
-        raw_token =  base64.b64decode(token)
+        raw_token = base64.b64decode(token)
         raw = self.getInterned(raw_token)
         pan = raw.hex()
         if pan[-1].lower() == 'f':
             return pan[:-1]
         return pan
-            
+
     def putString(self, s):
         raw = s.encode('utf-8')
         token = self.put(raw)
         return base64.b64encode(token).decode('utf-8')
 
     def getString(self, token):
-        raw_token =  base64.b64decode(token)
+        raw_token = base64.b64decode(token)
         raw = self.get(raw_token)
         return raw.decode('utf-8')
