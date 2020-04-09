@@ -1,9 +1,10 @@
 language: python
+
 python:
-	- "3.6"
-	- "3.7"
-	- "3.8"
+  - "3.6"
+  - "3.7"
+  - "3.8"
 script:
-	- pytest
+  - pytest
 after_success:
-	- codecov
+  - codecov
