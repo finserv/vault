@@ -8,9 +8,9 @@ from .key import Key
 
 class Vault:
     def __init__(self, keys, current):
-        self.current_prefix = [key.prefix for key in keys if key.uid == current][0]
         self.keys = {key.prefix: key for key in keys}
         self.random = Random.new()
+        self.useKey(current)
 
     def _key(self):
         return self.keys[self.current_prefix]
@@ -28,6 +28,22 @@ class Vault:
     def _decrypt(self, key, iv, data):
         cipher = AES.new(key, AES.MODE_GCM, iv)
         return cipher.decrypt(data)
+
+    def useKey(self, uid):
+        try:
+            self.current_prefix = [
+                key.prefix for key in self.keys.values() if key.uid == uid][0]
+        except IndexError:
+            raise ValueError('Unknown key')
+
+    def prefix(self):
+        return self.current_prefix
+
+    def prefixString(self):
+        return base64.b64encode(self.current_prefix).decode('utf-8')
+
+    def prefixPAN(self):
+        return self.prefixString()
 
     def put(self, raw: bytes):
         key = self._key()
@@ -47,10 +63,11 @@ class Vault:
         key = self._key()
         return key.prefix + self._encrypt(key.key, key.internedIV, raw)
 
-    def putInternedAll(self, raw: bytes):
+    def allInterned(self, raw: bytes):
         result = []
         for key in self.keys.values():
-            result.append(key.prefix + self._encrypt(key.key, key.internedIV, raw))
+            result.append(
+                key.prefix + self._encrypt(key.key, key.internedIV, raw))
         return result
 
     def getInterned(self, token: bytes):
@@ -66,12 +83,11 @@ class Vault:
         token = self.putInterned(raw)
         return base64.b64encode(token).decode('utf-8')
 
-    # FIXME: needs a better name
-    def putAllPAN(self, pan: str):
+    def allPAN(self, pan: str):
         if len(pan) % 2 == 1:
             pan += 'f'
         raw = bytes.fromhex(pan)
-        tokens = self.putInternedAll(raw)
+        tokens = self.allInterned(raw)
         return [base64.b64encode(token).decode('utf-8') for token in tokens]
 
     def getPAN(self, token: str):

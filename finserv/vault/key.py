@@ -1,5 +1,6 @@
 import hashlib
 
+
 class Key:
     MAX_UID = pow(2, 3 * 8) - 1
     PREFIX_SIZE = 3
