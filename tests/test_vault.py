@@ -76,7 +76,7 @@ def test_vault_PAN_reencrypt():
 
     # SELECT ... FROM ... WHERE pan NOT LIKE ?%
     for i, v in enumerate(history):
-        if not v.startsWith(currentPrefix):
+        if not v.startswith(currentPrefix):
             # UPDATE ... SET pan = ? WHERE ...
             history[i] = vault.putPAN(vault.getPAN(v))
 
